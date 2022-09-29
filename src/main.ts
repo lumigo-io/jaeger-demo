@@ -204,14 +204,20 @@ class DemoStack extends Stack {
       maxAzs: 2 // Default is all AZs in region
     });
 
-    const jaegerService = new JaegerStack(this, 'jaeger-backend', { env, vpc });
+    const jaegerService = new JaegerStack(this, 'jaeger-backend',{
+      env,
+      vpc,
+      tags: {
+        'LUMIGO_TAG': 'lumigo-jaeger-demo',
+      },
+    });
     const jaegerCollectorEndpoint = jaegerService.collectorUrl;
 
     const deployments: Array<DemoApplicationDeployment> = [
-      // {
-      //   deployment: 'qa',
-      //   failureRate: 0,
-      // },
+      {
+        deployment: 'qa',
+        failureRate: 0,
+      },
       {
         deployment: 'prod',
         failureRate: 50,
@@ -229,7 +235,7 @@ class DemoStack extends Stack {
         failureRate: demoSetup.failureRate,
         jaegerCollectorEndpoint,
         tags: {
-          'LUMIGO_TAG': 'OtelResourceAttributesDemo',
+          'LUMIGO_TAG': 'lumigo-jaeger-demo',
         }
       });
     });
@@ -247,6 +253,9 @@ const app = new App();
 
 new DemoStack(app, 'otel-ra-demo', {
   env,
+  tags: {
+    LUMIGO_TAG: `lumigo-jaeger-demo`,
+  },
 });
 
 app.synth();
