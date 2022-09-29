@@ -1,12 +1,11 @@
 import { join } from 'path';
 import { App, Duration, Stack, StackProps } from 'aws-cdk-lib';
 import { Vpc } from 'aws-cdk-lib/aws-ec2';
-import { AwsLogDriver, Cluster, ContainerImage, FargateService, FargateTaskDefinition, LogDrivers, Protocol, Secret as EcsSecret } from 'aws-cdk-lib/aws-ecs';
+import { AwsLogDriver, Cluster, ContainerImage, FargateService, FargateTaskDefinition, LogDrivers, Protocol } from 'aws-cdk-lib/aws-ecs';
 import { ApplicationProtocol, Protocol as AlbProtocol } from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import { Platform } from 'aws-cdk-lib/aws-ecr-assets';
 import { ApplicationLoadBalancedFargateService, ApplicationMultipleTargetGroupsFargateService } from 'aws-cdk-lib/aws-ecs-patterns';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
-import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
 
 interface JaegerStackProps extends StackProps {
@@ -109,8 +108,6 @@ class DemoApplicationStack extends Stack {
       vpc: props.vpc,
     });
 
-    const lumigoTokenSecret = EcsSecret.fromSecretsManager(Secret.fromSecretNameV2(this, 'Secret', 'AccessKeys'), 'LumigoToken');
-
     const serverPort = 80;
 
     const serverTaskDefinition = new FargateTaskDefinition(this, `ServerTask${props.deployment.toUpperCase()}Def`);
@@ -126,9 +123,6 @@ class DemoApplicationStack extends Stack {
         // LUMIGO_DEBUG_SPANDUMP: '/dev/stdout',
         SERVER_PORT: String(serverPort),
         FAILURE_RATE: String(props.failureRate || 0),
-      },
-      secrets: {
-        LUMIGO_TRACER_TOKEN: lumigoTokenSecret,
       },
       logging: new AwsLogDriver({ streamPrefix: 'server-app' }),
       portMappings: [
@@ -164,9 +158,6 @@ class DemoApplicationStack extends Stack {
         OTEL_RESOURCE_ATTRIBUTES: `deployment=${props.deployment}`,
         OTEL_SERVICE_NAME: 'http-client', // This will be the service name in Lumigo
         TARGET_URL: `http://${serverService.loadBalancer.loadBalancerDnsName}/api/greetings`,
-      },
-      secrets: {
-        LUMIGO_TRACER_TOKEN: lumigoTokenSecret,
       },
       logging: new AwsLogDriver({ streamPrefix: 'client-app' }),
     });
