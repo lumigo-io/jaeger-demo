@@ -199,7 +199,7 @@ class DemoStack extends Stack {
       env,
       vpc,
       tags: {
-        'LUMIGO_TAG': 'lumigo-jaeger-demo',
+        application: 'lumigo-jaeger-demo',
       },
     });
     const jaegerCollectorEndpoint = jaegerService.collectorUrl;
@@ -226,7 +226,7 @@ class DemoStack extends Stack {
         failureRate: demoSetup.failureRate,
         jaegerCollectorEndpoint,
         tags: {
-          'LUMIGO_TAG': 'lumigo-jaeger-demo',
+          application: 'lumigo-jaeger-demo',
         }
       });
     });
@@ -245,7 +245,7 @@ const app = new App();
 new DemoStack(app, 'otel-ra-demo', {
   env,
   tags: {
-    LUMIGO_TAG: `lumigo-jaeger-demo`,
+    application: `lumigo-jaeger-demo`,
   },
 });
 
