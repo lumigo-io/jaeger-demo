@@ -1,0 +1,3 @@
+requests
+lumigo_opentelemetry
+opentelemetry-exporter-jaeger
