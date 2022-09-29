@@ -13,15 +13,15 @@ const { BatchSpanProcessor } = require('@opentelemetry/sdk-trace-base');
   const app = express();
   
   app.get('/health', async (req, res) => {
-    res.send('OK').status(200);
+    res.status(200).send('OK');
   });
   
   app.get('/api/greetings', async (req, res) => {
     const r = Math.random();
     if (r * 100 < failureRate) {
-      res.send('Hello World').status(200);
+      res.status(200).send('Hello World');
     } else {
-      res.send('Having a bad minute!').status(500);
+      res.status(500).send('Having a bad minute!');
     }
   });
   
